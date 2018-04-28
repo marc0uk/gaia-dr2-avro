@@ -1,0 +1,11 @@
+@namespace("com.github.gaiadr2.avro.common")
+protocol Common {
+
+    record Dval {
+        // The value of a quantity
+        double value;
+
+        // The uncertainty associated to the value
+        double uncertainty;
+    }
+}

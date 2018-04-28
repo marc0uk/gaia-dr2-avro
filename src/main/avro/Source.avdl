@@ -1,6 +1,8 @@
 @namespace("com.github.gaiadr2.avro.source")
 protocol DR2 {
 
+    import idl "Common.avdl";
+
     enum AstroParamSolved {
         PositionOnly, Full
     }
@@ -17,20 +19,15 @@ protocol DR2 {
         NotAvailable, Constant, Variable
     }
 
-    record Dval {
-        double value;
-        double uncertainty;
-    }
-
     record CoreAstro {
         // Reference epoch of astrometry [Julian Years]
         double refEpoch;
 
         // Right ascension [deg]
-        Dval ra;
+        com.github.gaiadr2.avro.common.Dval ra;
 
         // Declination [deg]
-        Dval dec;
+        com.github.gaiadr2.avro.common.Dval dec;
 
         float correlationRaDec;
 
@@ -49,13 +46,13 @@ protocol DR2 {
 
     record OptAstro {
         // Parallax [mas]
-        Dval parallax;
+        com.github.gaiadr2.avro.common.Dval parallax;
 
         // Proper motion in RA direction [mas/year]
-        Dval pmRa;
+        com.github.gaiadr2.avro.common.Dval pmRa;
 
         // Proper motion in DEC direction [mas/year]
-        Dval pmDec;
+        com.github.gaiadr2.avro.common.Dval pmDec;
 
         float correlationRaParallax;
         float correlationRaPmRa;
@@ -103,7 +100,7 @@ protocol DR2 {
         float weightAl;
 
         // Astrometrically determined pseudocolour of the source
-        Dval pseudoColour;
+        com.github.gaiadr2.avro.common.Dval pseudoColour;
 
         // Mean Parallax factor AL
         float varpiFactorAl;
@@ -126,7 +123,7 @@ protocol DR2 {
         int numObs;
 
         // Source mean flux [e/s]
-        Dval flux;
+        com.github.gaiadr2.avro.common.Dval flux;
 
         // mean magnitude
         float mag;
@@ -145,7 +142,7 @@ protocol DR2 {
 
     record Rvs {
         // Radial velocity [km/s]
-        Dval radVel;
+        com.github.gaiadr2.avro.common.Dval radVel;
 
         // Number of transits used to compute radial velocity
         int transitUsed;
