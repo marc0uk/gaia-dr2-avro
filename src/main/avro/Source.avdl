@@ -1,0 +1,240 @@
+@namespace("com.github.gaiadr2.avro.source")
+protocol DR2 {
+
+    enum AstroParamSolved {
+        PositionOnly, Full
+    }
+
+    enum RotatorObjectType {
+        NotUsed, VLBI, AgnOrQuasar
+    }
+
+    enum PhotMode {
+        Gold, Silver, Bronze
+    }
+
+    enum VarFlag {
+        NotAvailable, Constant, Variable
+    }
+
+    record Dval {
+        double value;
+        double uncertainty;
+    }
+
+    record CoreAstro {
+        // Reference epoch of astrometry [Julian Years]
+        double refEpoch;
+
+        // Right ascension [deg]
+        Dval ra;
+
+        // Declination [deg]
+        Dval dec;
+
+        float correlationRaDec;
+
+        // Galactic longitude [deg]
+        double longGal;
+
+        // Galactic latitude [deg]
+        double latGal;
+
+        // Ecliptic longitude [deg]
+        double longEcl;
+
+        // Ecliptic latitude [deg]
+        double latEcl;
+    }
+
+    record OptAstro {
+        // Parallax [mas]
+        Dval parallax;
+
+        // Proper motion in RA direction [mas/year]
+        Dval pmRa;
+
+        // Proper motion in DEC direction [mas/year]
+        Dval pmDec;
+
+        float correlationRaParallax;
+        float correlationRaPmRa;
+        float correlationRaPmDec;
+        float correlationDecParallax;
+        float correlationDecPmRa;
+        float correlationDecPmDec;
+        float correlationParallaxPmRa;
+        float correlationParallaxPmDec;
+        float correlationPmRaPmDec;
+    }
+
+    record AstrometryMetadata {
+        // Total number of observations AL
+        int numObsAl;
+
+        // Total number of observations AC
+        int numObsAc;
+
+        // Total number of good observations AL
+        int numGoodObsAl;
+
+        // Total number of good observations AC
+        int numGoodObsAc;
+
+        // Number of bad observations AL
+        int numBadObsAl;
+
+        // Goodness of fit statistic of model wrt along-scan observations
+        float gofAl;
+
+        // AL chi-square value
+        float chi2Al;
+
+        // Excess noise of the source [mas]
+        double excessNoise;
+
+        // Significance of excess noise
+        double excessNoiseSignificance;
+
+        AstroParamSolved paramSolved;
+        boolean isPrimary;
+
+        // Mean astrometric weight of the source in the AL direction [mas^-2]
+        float weightAl;
+
+        // Astrometrically determined pseudocolour of the source
+        Dval pseudoColour;
+
+        // Mean Parallax factor AL
+        float varpiFactorAl;
+
+        // Matched FOV transits used in the AGIS solution
+        int matchedObservations;
+
+        // Number of visibility periods used in Astrometric solution
+        int visibilityPeriodsUsed;
+
+        // The longest semi-major axis of the 5-d error ellipsoid [mas]
+        float sigma5dMax;
+
+        // The type of the source mainly used for frame rotation
+        RotatorObjectType rotObjType;
+    }
+
+    record BandPhot {
+        // Number of observations contributing to the mean photometry
+        int numObs;
+
+        // Source mean flux [e/s]
+        Dval flux;
+
+        // mean magnitude
+        float mag;
+    }
+
+    record MagColour {
+        // BP - RP colour, when available [mag]
+        union {null, float} bp_rp;
+
+        // BP - G colour, when available [mag]
+        union {null, float} bp_g;
+
+        // RP - G colour, when available [mag]
+        union {null, float} rp_g;
+    }
+
+    record Rvs {
+        // Radial velocity [km/s]
+        Dval radVel;
+
+        // Number of transits used to compute radial velocity
+        int transitUsed;
+
+        // Teff of the template used to compute radial velocity
+        float templateTeff;
+
+        // logg of the template used to compute radial velocity
+        float templateLogg;
+
+        // Fe/H of the template used to compute radial velocity
+        float templateFeH;
+    }
+
+    record AstroPar {
+        // Value of the astrophysical parameter
+        float value;
+
+        // lower uncertainty value
+        float percentileLower;
+
+        // upper uncertainty value
+        float percentileUpper;
+    }
+
+    record AstroParams {
+        // Flags for the Apsis-Priam results
+        long priamFlags;
+
+        // Flags for the Apsis-FLAME results
+        long flameFlags;
+
+        // stellar effective temperature [K]
+        AstroPar effectiveTemperatur;
+
+        // line-of-sight extinction in the G band [mag]
+        AstroPar extinction;
+
+        // line-of-sight reddening [mag]
+        AstroPar reddening;
+
+        // stellar radius
+        AstroPar radius;
+
+        // stellar luminosity
+        AstroPar luminosity;
+    }
+
+    record GaiaSource {
+        long solutionId;
+        long sourceId;
+        long randomIndex;
+
+        // Positional information
+        CoreAstro basicAstrometry;
+
+        // Full astrometric parameters
+        union {null, OptAstro} fullAstrometry = null;
+
+        // Astrometry metadata
+        AstrometryMetadata astroMeta;
+
+        // Amount of observations matched to this source
+        int matchedObservations;
+
+        // Source with duplicate sources
+        boolean duplicated;
+
+        // G-band mean source photometry
+        BandPhot gPhot;
+
+        // BP mean source photometry, when available
+        union {null, BandPhot} bpPhot = null;
+
+        // RP mean source photometry, when available
+        union {null, BandPhot} rpPhot = null;
+
+        // Magnitude based colours, when available
+        MagColour magColours;
+
+        // Photometric calibration mode
+        PhotMode photMode;
+
+        // Variability flag
+        VarFlag varFlag;
+
+        // Results from the radial velocity processing, when available
+        union {null, Rvs} radialVelocity = null;
+
+        union {null, AstroParams} astrophysicalParamerts = null;
+    }
+}
