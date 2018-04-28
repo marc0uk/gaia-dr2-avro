@@ -1,2 +1,3 @@
-# gaia-dr2-avro
-Avro bindings for the Gaia DR2 data model
+# ESA Gaia Data Release 2 Spark tools
+
+
