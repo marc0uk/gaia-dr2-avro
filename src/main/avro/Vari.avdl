@@ -1,0 +1,266 @@
+@namespace("com.github.gaiadr2.avro.vari")
+protocol Vari {
+
+    import idl "Common.avdl";
+
+    enum ClassName {
+        ACEP, ARRD, CEP, DSCT_SXPHE, MIRA_SR, RRAB, RRC, RRD, T2CEP
+    }
+
+    record ClassifierResult {
+        long solutionId;
+        long sourceId;
+
+    // Classifier name used to produce this result,
+        string classifierName;
+
+    // Name of best class
+        ClassName bestClass;
+
+    // Score of the best class
+        double bestClassScore;
+    }
+
+    record LongPeriodVariable {
+        long solutionId;
+        long sourceId;
+
+    // Absolute bolometric magnitude of the star [mag]
+        com.github.gaiadr2.avro.common.Dval bolMag;
+
+    // Red supergiant flag
+        boolean supergiantFlag;
+
+    // Bolometric correction for LPVs
+        com.github.gaiadr2.avro.common.Dval bolCorr;
+
+    // Frequency of the LPV
+        com.github.gaiadr2.avro.common.Dval frequency;
+    }
+
+    record VarInfo {
+
+    // Period corresponding to the fundamental pulsation mode (for multi mode pulsators) in the G band time series [day]
+        com.github.gaiadr2.avro.common.Dval pf;
+
+    // Period corresponding to the first overtone pulsation mode (for multi mode pulsators) in the G band time series [day]
+        com.github.gaiadr2.avro.common.Dval p1o;
+
+    // Period corresponding to the second overtone pulsation mode (for multi mode pulsators) in the G band time series [day]
+        com.github.gaiadr2.avro.common.Dval p2o;
+
+    // Epoch of the maximum of the light curve in the G band
+        com.github.gaiadr2.avro.common.Dval epochMaxG;
+
+    // Epoch of the maximum of the light curve in the BP band
+        union {null, com.github.gaiadr2.avro.common.Dval} epochMaxBp = null;
+
+    // Epoch of the maximum of the light curve in the RP band
+        union {null, com.github.gaiadr2.avro.common.Dval} epochMaxRp = null;
+
+    // Intensity-averaged magnitude in the G band
+        com.github.gaiadr2.avro.common.Dval avgIntG;
+
+    // Intensity-averaged magnitude in the BP band
+        union {null, com.github.gaiadr2.avro.common.Dval} avgIntBp = null;
+
+    // Intensity-averaged magnitude in the RP band
+        union {null, com.github.gaiadr2.avro.common.Dval } avgIntRp = null;
+
+    // Peak-to-peak amplitude of the G band light curve
+        com.github.gaiadr2.avro.common.Dval peak2peakG;
+
+    // Peak-to-peak amplitude of the BP band light curve
+        union {null, com.github.gaiadr2.avro.common.Dval} peak2peakBp = null;
+
+    // Peak-to-peak amplitude of the RP band light curve
+        union {null, com.github.gaiadr2.avro.common.Dval} peak2peakRp = null;
+
+    // Metallicity
+        com.github.gaiadr2.avro.common.Dval metallicity;
+
+    // Fourier decomposition parameter r21_g
+        com.github.gaiadr2.avro.common.Dval r21g;
+
+    // Fourier decomposition parameter r31_g
+        com.github.gaiadr2.avro.common.Dval r31g;
+
+    // Fourier decomposition parameter phi21_g [rad]
+        com.github.gaiadr2.avro.common.Dval phi21g;
+
+    // Fourier decomposition parameter phi31_g [rad]
+        com.github.gaiadr2.avro.common.Dval phi31g;
+
+    // Number of G FoV epochs used in the fitting algorithm
+        int numCleanG;
+
+    // Number of BP epochs used in the fitting algorithm
+        int numCleanBp;
+
+    // Number of RP epochs used in the fitting algorithm
+        int numCleanRp;
+
+    // Interstellar absorption in the G-band
+        com.github.gaiadr2.avro.common.Dval absorptionG;
+    }
+
+    enum ClassCepheid {
+        DCEP, T2CEP, ACEP
+    }
+
+    enum SubClassType2 {
+        BL_HER, W_VIR, RV_TAU, NOT_APPLICABLE
+    }
+
+    enum ModeCepheid {
+        FUNDAMENTAL, FIRST_OVERTONE, SECOND_OVERTONE, MULTI, UNDEFINED, NOT_APPLICABLE
+    }
+
+    enum MultiModeCepheid {
+        F_FO, F_SO, FO_SO, FO_TO, SO_TO, F_FO_SO, FO_SO_TO
+    }
+
+    record Cepheid {
+        long solutionId;
+        long sourceId;
+
+    // Variability information
+        VarInfo info;
+
+    // Period corresponding to the third overtone pulsation mode [day]
+        com.github.gaiadr2.avro.common.Dval p3o;
+
+    // Best type classification estimate
+        ClassCepheid bestType;
+
+    // Best subclassification estimate for type_best_classification
+        SubClassType2 type2subtype;
+
+    // Best mode classification estimate
+        ModeCepheid bestMode;
+
+    // Best multi-mode classification estimate
+        MultiModeCepheid bestMultiMode;
+    }
+
+    enum ClassRRLyrae {
+        RRC, RRAB, RRD
+    }
+
+    record RRLyrae {
+        long solutionId;
+        long sourceId;
+
+    // Variability information
+        VarInfo info;
+
+    // Best RR Lyrae classification estimate
+        ClassRRLyrae bestClass;
+    }
+
+    record ShortTimeScale {
+        long solutionId;
+        long sourceId;
+
+    // Amplitude estimate of all per CCD G-band photometry (quantile(95%)-quantile(5%))
+        double amplitude;
+
+    // Number of FoV transits with more than 7 CCD measurements after time series cleaning
+        int numFovTransit;
+
+    // Mean of per-FOV Abbe values derived from CCD G-band photometry
+        double meanFovAbbe;
+
+    // Number of points in the variogram
+        int variogramNumPoints;
+
+    // Characteristic time scales of variability [day]
+        array<double> variogramTimescale;
+
+    // Variogram values associated with the characteristic time scales [mag^2]
+        array<double> variogramValues;
+
+    // Frequency search result for either G CCD, G FoV, BP or RP photometry
+        union {null, double} frequency = null;
+    }
+
+    record SegmentInfo {
+
+    // Time at which segments start [day]
+        double segStart;
+
+    // Time at which segments end [day]
+        double segEnd;
+
+    // Colour-Magnitude Intercept in segment
+        com.github.gaiadr2.avro.common.Dval colourMagIntercept;
+
+    // Colour-Magnitude Slope in segment
+        com.github.gaiadr2.avro.common.Dval colourMagSlope;
+
+    // Correlation coefficient in segment
+        double correlationCoefficient;
+
+    // Correlation coefficient significance in segment
+        double correlationSignificance;
+
+    // Rotation period in segment [day]
+        com.github.gaiadr2.avro.common.Dval rotPeriod;
+
+    // FAP on rotation period in segment [day]
+        double rotationPeriodFap;
+
+    // Coefficient of cosine term of linear fit in segment [mag]
+        com.github.gaiadr2.avro.common.Dval cosTerm;
+
+    // Coefficient of sin term of linear fit in segment [mag]
+        com.github.gaiadr2.avro.common.Dval sinTerm;
+
+    // Constant term (A0) of linear fit in segment [mag]
+        com.github.gaiadr2.avro.common.Dval a0Term;
+
+    // Activity Index in segment [mag]
+        com.github.gaiadr2.avro.common.Dval activityIndex;
+
+    // The unspotted G mags in segment [mag]
+        com.github.gaiadr2.avro.common.Dval unspottedG;
+
+    // The unspotted BP mag in segment
+        union {null, com.github.gaiadr2.avro.common.Dval} unspottedBp = null;
+
+    // The unspotted RP mag in segment
+        union {null, com.github.gaiadr2.avro.common.Dval} unspottedRp = null;
+    }
+
+    record RotationModulation {
+        long solutionId;
+        long sourceId;
+
+    // Number of segments
+        int numSegments;
+
+    // Information on each segment
+        array<SegmentInfo> segments;
+
+    // Number of outliers
+        int numOutliers;
+
+    // Times at which outliers occurs [day]
+        array<double> outliersTime;
+
+    // Best rotation period [day]
+        com.github.gaiadr2.avro.common.Dval bestRotPeriod;
+
+    // Maximum activity Index [mag]
+        com.github.gaiadr2.avro.common.Dval activityIndex;
+
+    // The unspotted G mags [mag]
+        com.github.gaiadr2.avro.common.Dval unspottedG;
+
+    // The unspotted BP mag
+        union {null, com.github.gaiadr2.avro.common.Dval} unspottedBp = null;
+
+    // The unspotted RP mag
+        union {null, com.github.gaiadr2.avro.common.Dval} unspottedRp = null;
+    }
+}

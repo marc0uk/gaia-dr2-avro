@@ -1,0 +1,61 @@
+@namespace("com.github.gaiadr2.avro.vari.aux")
+protocol VariAux {
+
+    record BandStats {
+    // Total number of FOV transits selected for variability analysis [day]
+        int numSelFov;
+
+    // Mean observation time for FoV transits [day]
+        double meanObsTimeFov;
+
+    // Time duration of the time series for FoV transits [day]
+        double durationFov;
+
+    // Minimum FoV magnitude [mag]
+        double minFovMag;
+
+    // Maximum FoV magnitude [mag]
+        double maxFovMag;
+
+    // Mean FoV magnitude
+        double meanFovMag;
+
+    // Median FoV magnitude
+        double medianFovMag;
+
+    // Difference between the highest and lowest FoV magnitudes [mag]
+        double rangeFovMag;
+
+    // Square root of the unweighted FoV magnitude variance [mag]
+        double stdDevFovMag;
+
+    // Standardized unweighted FoV magnitude skewness
+        double skewnessFovMag;
+
+    // Standardized unweighted FoV magnitude kurtosis
+        double kurtosisFovMag;
+
+    // Median Absolute Deviation (MAD) for FoV transits [mag]
+        double madFovMag;
+
+    // Abbe value for FoV transits
+        double abbeFovMag;
+
+    // Interquartile range for FoV transits
+        double iqrFovMag;
+    }
+
+    record TimeSeriesStats {
+        long solutionId;
+        long sourceId;
+
+    // Statistics for the G time series
+        BandStats gbandStats;
+
+    // Statistics for the BP time series
+        union {null, BandStats} bpStats = null;
+
+    // Statistic for the RP time series
+        union {null, BandStats} rpStats = null;
+    }
+}
