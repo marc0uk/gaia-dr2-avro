@@ -12,7 +12,7 @@
 
     <modules>
         <module>GaiaDr2Avro</module>
-        <module>GaiaDr2Import</module>
+        <module>GaiaDr2Load</module>
     </modules>
 
     <licenses>

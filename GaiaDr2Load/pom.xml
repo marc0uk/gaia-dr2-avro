@@ -9,8 +9,8 @@
         <version>0.0.1</version>
     </parent>
 
-    <artifactId>GaiaDr2Import</artifactId>
-    <name>GaiaDr2Import</name>
+    <artifactId>GaiaDr2Load</artifactId>
+    <name>GaiaDr2Load</name>
 
     <properties>
         <scala.version>2.11</scala.version>
@@ -33,6 +33,7 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.version}</artifactId>
             <version>${spark.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
