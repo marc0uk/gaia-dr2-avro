@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>GaiaDr2Spark</artifactId>
+        <groupId>com.github.marc0uk</groupId>
+        <version>0.0.1</version>
+    </parent>
+
+    <artifactId>GaiaDr2Import</artifactId>
+    <name>GaiaDr2Import</name>
+
+    <properties>
+        <scala.version>2.11</scala.version>
+        <spark.version>2.3.0</spark.version>
+        <parquet.version>1.8.1</parquet.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.parquet</groupId>
+            <artifactId>parquet-column</artifactId>
+            <version>${parquet.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.parquet</groupId>
+            <artifactId>parquet-avro</artifactId>
+            <version>${parquet.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_${scala.version}</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+    </dependencies>
+</project>
