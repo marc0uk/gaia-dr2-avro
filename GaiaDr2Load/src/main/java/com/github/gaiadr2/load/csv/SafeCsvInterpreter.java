@@ -88,6 +88,22 @@ public final class SafeCsvInterpreter<F extends Enum<F>> implements CsvInterpret
     }
 
     @Override
+    public Optional<Boolean> booleanValue(final F column) {
+        final String raw = raw(column);
+        if (raw.isEmpty()) {
+            return Optional.empty();
+        }
+        switch (raw) {
+            case "true":
+                return Optional.of(true);
+            case "false":
+                return Optional.of(false);
+            default:
+                throw NonCompliantColumnFailure.notBoolean(column, raw);
+        }
+    }
+
+    @Override
     public Optional<String> rawValue(final F column) {
         final String raw = raw(column);
         return raw.isEmpty() ?

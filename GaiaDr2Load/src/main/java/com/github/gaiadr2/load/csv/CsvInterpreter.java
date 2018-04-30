@@ -36,6 +36,12 @@ public interface CsvInterpreter<F extends Enum<F>> extends Consumer<String> {
     OptionalDouble doubleValue(final F column);
 
     /**
+     * @param column A column expected to provide a {@code boolean} value
+     * @return The value, when available
+     */
+    Optional<Boolean> booleanValue(final F column);
+
+    /**
      * @param column A column
      * @return The raw value of the column, when not empty
      */

@@ -30,14 +30,15 @@ class SafeCsvInterpreterTest {
         LongColumn,
         StringColumn,
         FloatColumn,
-        DoubleColumn
+        DoubleColumn,
+        BooleanColumn
     }
 
     private final Random rng = new Random(424242242424L);
     private final CsvInterpreter<Columns> interpreter = new SafeCsvInterpreter<>(Columns.class);
 
     @ParameterizedTest
-    @ValueSource(strings = {"int", "long", "float", "double", "raw"})
+    @ValueSource(strings = {"int", "long", "float", "double", "raw", "boolean"})
     void nonInitialisedInterpreterCausesException(final String type) {
         final InvocationTargetException ex = assertThrows(InvocationTargetException.class, () -> method(type).invoke(interpreter, Columns.IntColumn));
         assertThrows(IllegalArgumentException.class, () -> {
@@ -47,13 +48,13 @@ class SafeCsvInterpreterTest {
 
     @Test
     void emptyIntColumnProducesEmptyOptional() {
-        interpreter.accept(",12345,NotAvailable,1.345678,1987.6767");
+        interpreter.accept(",12345,NotAvailable,1.345678,1987.6767,");
         assertFalse(interpreter.intValue(Columns.IntColumn).isPresent());
         assertFalse(interpreter.rawValue(Columns.IntColumn).isPresent());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"12345,,NotAvailable,1.345678,1987.6767", ",,NotAvailable,1.345678,1987.6767"})
+    @ValueSource(strings = {"12345,,NotAvailable,1.345678,1987.6767,false", ",,NotAvailable,1.345678,1987.6767,false"})
     void emptyLongColumnProducesEmptyOptional(final String line) {
         interpreter.accept(line);
         assertFalse(interpreter.longValue(Columns.LongColumn).isPresent());
@@ -61,7 +62,7 @@ class SafeCsvInterpreterTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"12345,12345678980,NotAvailable,,1987.67678089089", ",,,,1987.67678089089"})
+    @ValueSource(strings = {"12345,12345678980,NotAvailable,,1987.67678089089,", ",,,,1987.67678089089,"})
     void emptyFloatColumnProducesEmptyOptional(final String line) {
         interpreter.accept(line);
         assertFalse(interpreter.floatValue(Columns.FloatColumn).isPresent());
@@ -70,18 +71,19 @@ class SafeCsvInterpreterTest {
 
     @Test
     void emptyDoubleColumnProducesEmptyOptional() {
-        interpreter.accept("12345,12345678980,NotAvailable,1987.6767,");
+        interpreter.accept("12345,12345678980,NotAvailable,1987.6767,,");
         assertFalse(interpreter.doubleValue(Columns.DoubleColumn).isPresent());
         assertFalse(interpreter.rawValue(Columns.DoubleColumn).isPresent());
     }
 
     @Test
     void allEmptyIsFine() {
-        interpreter.accept(",,,,");
+        interpreter.accept(",,,,,");
         assertFalse(interpreter.intValue(Columns.IntColumn).isPresent());
         assertFalse(interpreter.longValue(Columns.LongColumn).isPresent());
         assertFalse(interpreter.floatValue(Columns.FloatColumn).isPresent());
         assertFalse(interpreter.doubleValue(Columns.DoubleColumn).isPresent());
+        assertFalse(interpreter.booleanValue(Columns.BooleanColumn).isPresent());
     }
 
     @Test
@@ -95,37 +97,43 @@ class SafeCsvInterpreterTest {
     void tooManyColumnsCausesFailure() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> interpreter.accept("12345,12345678980,NotAvailable1987.6767,,1987.67678089089,23,12345,97"));
+                () -> interpreter.accept("12345,123L,NotAvailable1987.6767,,1987.67678089089,false,12345,97"));
     }
 
     @Test
     void illegalIntegerValueCausesFailure() {
-        interpreter.accept("Invalid,12345678890,Whatever,,");
+        interpreter.accept("Invalid,12345678890,Whatever,,,");
         assertThrows(NonCompliantColumnFailure.class, () -> interpreter.intValue(Columns.IntColumn));
     }
 
     @Test
     void illegalLongValueCausesFailure() {
-        interpreter.accept(",1.1,Whatever,,");
+        interpreter.accept(",1.1,Whatever,,,");
         assertThrows(NonCompliantColumnFailure.class, () -> interpreter.longValue(Columns.LongColumn));
     }
 
     @Test
     void illegalFloatValueCausesFailure() {
-        interpreter.accept(",1,Whatever,1L,");
+        interpreter.accept(",1,Whatever,1L,,");
         assertThrows(NonCompliantColumnFailure.class, () -> interpreter.floatValue(Columns.FloatColumn));
     }
 
     @Test
     void illegalDoubleValueCausesFailure() {
-        interpreter.accept(",1,Whatever,1.1,1L");
+        interpreter.accept(",1,Whatever,1.1,1L,");
         assertThrows(NonCompliantColumnFailure.class, () -> interpreter.doubleValue(Columns.DoubleColumn));
+    }
+
+    @Test
+    void illegalBooleanCausesFailure() {
+        interpreter.accept("1,2L,WhatEver,2.1f,3.14D,TRUE");
+        assertThrows(NonCompliantColumnFailure.class, () -> interpreter.booleanValue(Columns.BooleanColumn));
     }
 
     @RepeatedTest(50)
     void validIntegerIsCorrectlyInterpreted() {
         final int expected = rng.nextInt();
-        interpreter.accept(format("%d,1L,Whatever,1f,1D", expected));
+        interpreter.accept(format("%d,1L,Whatever,1f,1D,false", expected));
         final OptionalInt optVal = interpreter.intValue(Columns.IntColumn);
         assertTrue(optVal.isPresent());
         assertEquals(expected, optVal.getAsInt());
@@ -134,7 +142,7 @@ class SafeCsvInterpreterTest {
     @RepeatedTest(50)
     void validLongIsCorrectlyInterpreted() {
         final long expected = rng.nextLong();
-        interpreter.accept(format("1,%d,Whatever,1f,1D", expected));
+        interpreter.accept(format("1,%d,Whatever,1f,1D,false", expected));
         final OptionalLong optVal = interpreter.longValue(Columns.LongColumn);
         assertTrue(optVal.isPresent());
         assertEquals(expected, optVal.getAsLong());
@@ -143,7 +151,7 @@ class SafeCsvInterpreterTest {
     @RepeatedTest(50)
     void validFloatIsCorrectlyInterpreted() {
         final float expected = rng.nextFloat();
-        interpreter.accept(format("1,1L,Whatever,%s,1D", Float.toString(expected)));
+        interpreter.accept(format("1,1L,Whatever,%s,1D,false", Float.toString(expected)));
         final Optional<Float> optVal = interpreter.floatValue(Columns.FloatColumn);
         assertTrue(optVal.isPresent());
         assertEquals(expected, optVal.get(), 1E-3);
@@ -152,16 +160,28 @@ class SafeCsvInterpreterTest {
     @RepeatedTest(50)
     void validDoubleIsCorrectlyInterpreted() {
         final double expected = rng.nextDouble();
-        interpreter.accept(format("1,1L,Whatever,1f,%s", Double.toString(expected)));
+        interpreter.accept(format("1,1L,Whatever,1f,%s,true", Double.toString(expected)));
         final OptionalDouble optVal = interpreter.doubleValue(Columns.DoubleColumn);
         assertTrue(optVal.isPresent());
         assertEquals(expected, optVal.getAsDouble(), 1E-30);
     }
 
     @Test
+    void validBooleanColumnIsCorrectlyInterpreted() {
+        interpreter.accept("1,1L,Whatever,1f,2.3D,false");
+        final Optional<Boolean> optFalse = interpreter.booleanValue(Columns.BooleanColumn);
+        assertTrue(optFalse.isPresent());
+        assertFalse(optFalse.get());
+        interpreter.accept("1,1L,Whatever,1f,2.3D,true");
+        final Optional<Boolean> optTrue = interpreter.booleanValue(Columns.BooleanColumn);
+        assertTrue(optTrue.isPresent());
+        assertTrue(optTrue.get());
+    }
+
+    @Test
     void populatedColumnReturnsFilledOptional() {
         final String expected = "Valid";
-        interpreter.accept(format("12345,12345678980,%s,1987.6767,", expected));
+        interpreter.accept(format("12345,12345678980,%s,1987.6767,true", expected));
         final Optional<String> optVal = interpreter.rawValue(Columns.StringColumn);
         assertTrue(optVal.isPresent());
         assertEquals(expected, optVal.get());
