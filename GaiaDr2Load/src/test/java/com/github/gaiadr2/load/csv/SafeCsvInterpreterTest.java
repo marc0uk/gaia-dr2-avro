@@ -130,6 +130,22 @@ class SafeCsvInterpreterTest {
         assertThrows(NonCompliantColumnFailure.class, () -> interpreter.booleanValue(Columns.BooleanColumn));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"Infinity", "-Infinity", "NaN"})
+    void nonFiniteFloatAreFiltered(final String value) {
+        interpreter.accept(format("1,1L,Whatever,%s,1D,false", value));
+        final Optional<Float> optVal = interpreter.floatValue(Columns.FloatColumn);
+        assertFalse(optVal.isPresent());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Infinity", "-Infinity", "NaN"})
+    void nonFiniteDoubleAreFiltered(final String value) {
+        interpreter.accept(format("1,1L,Whatever,1f,%s,false", value));
+        final OptionalDouble optVal = interpreter.doubleValue(Columns.DoubleColumn);
+        assertFalse(optVal.isPresent());
+    }
+
     @RepeatedTest(50)
     void validIntegerIsCorrectlyInterpreted() {
         final int expected = rng.nextInt();
@@ -181,7 +197,7 @@ class SafeCsvInterpreterTest {
     @Test
     void populatedColumnReturnsFilledOptional() {
         final String expected = "Valid";
-        interpreter.accept(format("12345,12345678980,%s,1987.6767,true", expected));
+        interpreter.accept(format("12345,12345678980,%s,1987.6767f,1987.6767676767,true", expected));
         final Optional<String> optVal = interpreter.rawValue(Columns.StringColumn);
         assertTrue(optVal.isPresent());
         assertEquals(expected, optVal.get());

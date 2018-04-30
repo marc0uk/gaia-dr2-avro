@@ -68,7 +68,10 @@ public final class SafeCsvInterpreter<F extends Enum<F>> implements CsvInterpret
             return Optional.empty();
         }
         try {
-            return Optional.of(Float.parseFloat(raw));
+            final float value = Float.parseFloat(raw);
+            return Float.isFinite(value) ?
+                    Optional.of(value) :
+                    Optional.empty();
         } catch (NumberFormatException e) {
             throw NonCompliantColumnFailure.notFloat(column, raw);
         }
@@ -81,7 +84,10 @@ public final class SafeCsvInterpreter<F extends Enum<F>> implements CsvInterpret
             return OptionalDouble.empty();
         }
         try {
-            return OptionalDouble.of(Double.parseDouble(raw));
+            final double value = Double.parseDouble(raw);
+            return Double.isFinite(value) ?
+                    OptionalDouble.of(value) :
+                    OptionalDouble.empty();
         } catch (NumberFormatException e) {
             throw NonCompliantColumnFailure.notDouble(column, raw);
         }
