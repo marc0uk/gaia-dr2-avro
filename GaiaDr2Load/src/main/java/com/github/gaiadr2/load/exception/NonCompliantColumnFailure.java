@@ -5,8 +5,6 @@ import static java.lang.String.format;
 /**
  * This failure mode happens when the value for a CSV file column does not match the type
  * specified in the Gaia DR2 archive data model.
- *
- * @author Marco Riello
  */
 public final class NonCompliantColumnFailure extends RuntimeException {
 
@@ -48,6 +46,15 @@ public final class NonCompliantColumnFailure extends RuntimeException {
      */
     public static <C extends Enum<C>> NonCompliantColumnFailure notDouble(final C column, final String value) {
         return new NonCompliantColumnFailure(message("double", column, value));
+    }
+
+    /**
+     * @param column Column
+     * @param value Value of the column
+     * @return Exception for the value not being a valid boolean value
+     */
+    public static <F extends Enum<F>> NonCompliantColumnFailure notBoolean(final F column, final String value) {
+        return new NonCompliantColumnFailure(message("boolean", column, value));
     }
 
     /**
