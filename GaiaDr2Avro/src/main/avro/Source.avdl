@@ -75,9 +75,6 @@ protocol DR2 {
         // Total number of good observations AL
         int numGoodObsAl;
 
-        // Total number of good observations AC
-        int numGoodObsAc;
-
         // Number of bad observations AL
         int numBadObsAl;
 
@@ -100,7 +97,7 @@ protocol DR2 {
         float weightAl;
 
         // Astrometrically determined pseudocolour of the source
-        com.github.gaiadr2.avro.common.Dval pseudoColour;
+        union {null, com.github.gaiadr2.avro.common.Dval} pseudoColour = null;
 
         // Mean Parallax factor AL
         float varpiFactorAl;
@@ -129,7 +126,10 @@ protocol DR2 {
         float mag;
     }
 
-    record MagColour {
+    record ColourInfo {
+        // XP flux excess
+        union {null, float} bpRpExcessFactor;
+
         // BP - RP colour, when available [mag]
         union {null, float} bp_rp;
 
@@ -176,7 +176,7 @@ protocol DR2 {
         long flameFlags;
 
         // stellar effective temperature [K]
-        AstroPar effectiveTemperatur;
+        AstroPar effectiveTemperature;
 
         // line-of-sight extinction in the G band [mag]
         AstroPar extinction;
@@ -220,8 +220,8 @@ protocol DR2 {
         // RP mean source photometry, when available
         union {null, BandPhot} rpPhot = null;
 
-        // Magnitude based colours, when available
-        MagColour magColours;
+        // Colour information, when available
+        ColourInfo colourInfo;
 
         // Photometric calibration mode
         PhotMode photMode;
@@ -232,6 +232,6 @@ protocol DR2 {
         // Results from the radial velocity processing, when available
         union {null, Rvs} radialVelocity = null;
 
-        union {null, AstroParams} astrophysicalParamerts = null;
+        union {null, AstroParams} astrophysicalParameters = null;
     }
 }
