@@ -5,4 +5,4 @@ script:
   - mvn test -B -P code-coverage
 
 after_success:
-  - mvn test jacoco:report coveralls:report
+  - mvn test jacoco:report coveralls:report -P code-coverage
